@@ -61,7 +61,7 @@ def view(category=None):
         SELECT * FROM EXPENSES
         '''
         SQLtotal = '''
-        SELECT SUM(Amount) FROM EXPENSES WHERE Category = '{}'
+        SELECT SUM(Amount) FROM EXPENSES
         '''.format(category)
     cursor.execute(SQL)
     results = cursor.fetchall()
@@ -69,6 +69,3 @@ def view(category=None):
     totalAmount = cursor.fetchone()[0]
 
     return totalAmount, results
-
-
-print(view('gas'))
