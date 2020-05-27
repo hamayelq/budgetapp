@@ -9,6 +9,7 @@ Expense Tracker CLI
 Usage:
     spent_driver.py init
     spent_driver.py view [<viewCategory>]
+    spent_driver.py delete <amount> <category> [<message>]
     spent_driver.py <amount> <category> [<message>]
 '''
 
@@ -35,3 +36,14 @@ if args['<amount>']:
     except:
         print('Error\n')
         print(usage)
+
+
+if args['delete']:
+    amount = float(args['<amount>'])
+    delete(amount, args['<category>'], args['<message>'])
+    if(args['<message>']):
+        print("Expense of amount ${}, with category {} and message '{}' deleted.".format(
+            str(amount), args['<category>'], args['<message>']))
+    else:
+        print("Expense of amount ${} and category {} deleted.".format(
+            str(amount), args['<category>']))

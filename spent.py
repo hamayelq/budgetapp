@@ -36,14 +36,19 @@ def log(amount, category, message=""):
 def delete(amount, category, message=""):
     connect = db.connect("spent.db")
     cursor = connect.cursor()
-    SQL = '''
-    DELETE FROM EXPENSES WHERE Amount = {} AND Category = '{}' AND MESSAGE = '{}'
-    '''
+    if message and len(message) > 0:
+        SQL = '''
+        DELETE FROM EXPENSES WHERE Amount = {} AND Category = '{}' AND Message = '{}'
+        '''.format(amount, category, message)
+    else:
+        SQL = '''
+        DELETE FROM EXPENSES WHERE Amount = {} AND Category = '{}'
+        '''.format(amount, category, message)
     try:
-        cursor.exequte(SQL)
+        cursor.execute(SQL)
+        connect.commit()
     except:
         print("Please enter all fields. Try again!")
-    connect.commit()
 
 
 def view(category=None):
