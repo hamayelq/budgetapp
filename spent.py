@@ -3,6 +3,9 @@ from datetime import datetime
 
 
 def init():
+    """
+    Creating table if it doesn't exist
+    """
     connect = db.connect("spent.db")
     cursor = connect.cursor()
     SQL = '''
@@ -18,6 +21,10 @@ def init():
 
 
 def log(amount, category, message=""):
+    """
+    Inserting record into database based on amount, category,
+    and message passed
+    """
     date = str(datetime.now())
     connect = db.connect("spent.db")
     cursor = connect.cursor()
@@ -34,6 +41,10 @@ def log(amount, category, message=""):
 
 
 def delete(amount, category, message=""):
+    """
+    Deleting record based on amount, category, and message
+    passed in
+    """
     connect = db.connect("spent.db")
     cursor = connect.cursor()
     if message and len(message) > 0:
@@ -52,6 +63,9 @@ def delete(amount, category, message=""):
 
 
 def view(category=None):
+    """
+    Looking at entries in database
+    """
     connect = db.connect("spent.db")
     cursor = connect.cursor()
     if category:
