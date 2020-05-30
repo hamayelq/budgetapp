@@ -8,24 +8,38 @@ def init():
     """
     connect = db.connect("test.db")
     cursor = connect.cursor()
-    SQL = '''
-    CREATE TABLE IF NOT EXISTS EXPENSES (
+    ExpensesTable = '''
+    CREATE TABLE IF NOT EXISTS Expenses (
         Amount number,
         Category string,
         Message string,
         Date string
     )
     '''
-    SQL2 = '''
-    CREATE TABLE IF NOT EXISTS INCOME (
+    IncomeTable = '''
+    CREATE TABLE IF NOT EXISTS Income (
         payAmount number,
         payCategory string,
         payMessage string,
         payDate string
     )
     '''
-    cursor.execute(SQL)
-    cursor.execute(SQL2)
+    totalIncomeTable = '''
+    CREATE TABLE IF NOT EXISTS TotalIncome (
+        totalIncome number,
+    )
+    '''
+
+    IncomeTrigger = '''
+    CREATE OR REPLACE TRIGGER upPayment TotalIncome 
+    AFTER INSERT OR UPDATE ON Income
+    FOR EACH ROW
+    BEGIN
+        
+
+    '''
+    cursor.execute(ExpensesTable)
+    cursor.execute(IncomeTable)
     connect.commit()
 
 
@@ -38,14 +52,17 @@ def logPay(amount, category, message=""):
     connect = db.connect("test.db")
     cursor = connect.cursor()
     SQL = '''
-    INSERT INTO INCOME VALUES (
-        {},
-        {},
-        {},
-        {}
+    INSERT INTO Income VALUES (
+         {},
+        '{}',
+        '{}',
+        '{}'
     )
     '''.format(amount, category, message, date)
-    cursor.execute(SQL)
+    try:
+        cursor.execute(SQL)
+    except:
+        print("Couldn't log pay amount. Try again.")
     connect.commit()
 
 
@@ -58,7 +75,7 @@ def log(amount, category, message=""):
     connect = db.connect("test.db")
     cursor = connect.cursor()
     SQL = '''
-    INSERT INTO EXPENSES VALUES (
+    INSERT INTO Expenses VALUES (
          {},
         '{}',
         '{}',
@@ -78,20 +95,20 @@ def delete(amount, category, message=""):
     cursor = connect.cursor()
     if message and len(message) > 0:
         SQL = '''
-        DELETE FROM EXPENSES WHERE Amount = {} AND Category = '{}' AND Message = '{}'
+        DELETE FROM Expenses WHERE Amount = {} AND Category = '{}' AND Message = '{}'
         '''.format(amount, category, message)
     else:
         SQL = '''
-        DELETE FROM EXPENSES WHERE Amount = {} AND Category = '{}'
+        DELETE FROM Expenses WHERE Amount = {} AND Category = '{}'
         '''.format(amount, category, message)
     try:
         cursor.execute(SQL)
-        connect.commit()
     except:
         print("Please enter all fields. Try again!")
+    connect.commit()
 
 
-def view(category=None):
+def viewExpense(category=None):
     """
     Looking at entries in expenses database
     """
@@ -99,17 +116,17 @@ def view(category=None):
     cursor = connect.cursor()
     if category:
         SQL = '''
-        SELECT * FROM EXPENSES WHERE Category = '{}'
+        SELECT * FROM Expenses WHERE Category = '{}'
         '''.format(category)
         SQLtotal = '''
-        SELECT SUM(Amount) FROM EXPENSES WHERE Category = '{}'
+        SELECT SUM(Amount) FROM Expenses WHERE Category = '{}'
         '''.format(category)
     else:
         SQL = '''
-        SELECT * FROM EXPENSES
+        SELECT * FROM Expenses
         '''
         SQLtotal = '''
-        SELECT SUM(Amount) FROM EXPENSES
+        SELECT SUM(Amount) FROM Expenses
         '''.format(category)
     cursor.execute(SQL)
     results = cursor.fetchall()
@@ -127,17 +144,17 @@ def viewPay(category=None):
     cursor = connect.cursor()
     if category:
         SQL = '''
-        SELECT * FROM INCOME WHERE payCategory = '{}'
+        SELECT * FROM Income WHERE payCategory = '{}'
         '''.format(category)
         SQLtotal = '''
-        SELECT SUM(payAmount) FROM EXPENSES WHERE payCategory = '{}'
+        SELECT SUM(payAmount) FROM Expenses WHERE payCategory = '{}'
         '''.format(category)
     else:
         SQL = '''
-        SELECT * FROM INCOME
+        SELECT * FROM Income
         '''
         SQLtotal = '''
-        SELECT SUM(payAmount) FROM INCOME
+        SELECT SUM(payAmount) FROM Income
         '''.format(category)
     cursor.execute(SQL)
     results = cursor.fetchall()
@@ -145,3 +162,17 @@ def viewPay(category=None):
     totalAmount = cursor.fetchone()[0]
 
     return totalAmount, results
+
+
+def viewTotalIncome():
+    connect = db.connect("test.db")
+    cursor = connect.cursor()
+
+    SQL = '''
+    SELECT * FROM TotalIncome
+    '''
+    cursor.execute(SQL)
+    results = cursor.fetchall()
+    totalIncome = cursor.fetchone()[0]
+
+    return totalIncome

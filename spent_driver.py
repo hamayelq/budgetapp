@@ -26,9 +26,10 @@ if args['init']:
 
 if args['viewexpense']:
     category = args['<viewCategory>']
-    amount, results = view(category)
+    amount, results = viewExpense(category)
     print("Total Expenses: " + str(amount))
     print(tabulate(results))
+
 
 if args['viewpay']:
     category = args['<viewCategory>']
