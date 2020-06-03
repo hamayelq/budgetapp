@@ -2,7 +2,7 @@ import sqlite3 as db
 from datetime import datetime
 
 
-def init():
+def init(totalIncome):
     """
     Creating table if it doesn't exist
     """
@@ -16,6 +16,7 @@ def init():
         Date string
     )
     '''
+
     IncomeTable = '''
     CREATE TABLE IF NOT EXISTS Income (
         payAmount number,
@@ -24,22 +25,24 @@ def init():
         payDate string
     )
     '''
+
     totalIncomeTable = '''
     CREATE TABLE IF NOT EXISTS TotalIncome (
         totalIncome number,
+        incomeId number DEFAULT 1
+    );
+    '''
+
+    populateTotalIncomeTable = '''
+    INSERT INTO TotalIncome VALUES (
+        {}
     )
-    '''
+    '''.format(totalIncome)
 
-    IncomeTrigger = '''
-    CREATE OR REPLACE TRIGGER upPayment TotalIncome 
-    AFTER INSERT OR UPDATE ON Income
-    FOR EACH ROW
-    BEGIN
-        
-
-    '''
     cursor.execute(ExpensesTable)
     cursor.execute(IncomeTable)
+    cursor.execute(totalIncomeTable)
+    cursor.execute(populateTotalIncomeTable)
     connect.commit()
 
 
@@ -59,14 +62,20 @@ def logPay(amount, category, message=""):
         '{}'
     )
     '''.format(amount, category, message, date)
+    SQL2 = '''
+    UPDATE TotalIncome
+    SET
+        TotalIncome = TotalIncome + {}
+    '''.format(amount)
     try:
         cursor.execute(SQL)
+        cursor.execute(SQL2)
     except:
         print("Couldn't log pay amount. Try again.")
     connect.commit()
 
 
-def log(amount, category, message=""):
+def logExpense(amount, category, message=""):
     """
     Inserting record into database based on amount, category,
     and message passed
@@ -82,7 +91,13 @@ def log(amount, category, message=""):
         '{}'
     )
     '''.format(amount, category, message, date)
+    SQL2 = '''
+    UPDATE TotalIncome
+    SET
+        TotalIncome = TotalIncome - {}
+    '''.format(amount)
     cursor.execute(SQL)
+    cursor.execute(SQL2)
     connect.commit()
 
 
@@ -172,7 +187,7 @@ def viewTotalIncome():
     SELECT * FROM TotalIncome
     '''
     cursor.execute(SQL)
-    results = cursor.fetchall()
+    # results = cursor.fetchall()
     totalIncome = cursor.fetchone()[0]
 
     return totalIncome

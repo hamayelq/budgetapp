@@ -7,7 +7,8 @@ usage = '''
 Expense Tracker CLI
 
 Usage:
-    spent_driver.py init
+    spent_driver.py init <totalIncome>
+    spent_driver.py viewtotal
     spent_driver.py viewexpense [<viewCategory>]
     spent_driver.py viewpay [<viewPayCategory>]
     spent_driver.py delete <amount> <category> [<message>]
@@ -20,9 +21,12 @@ args = docopt(usage)
 
 
 if args['init']:
-    init()
-    print("User Profile Created")
+    totalIncome = args['<totalIncome>']
+    init(totalIncome)
+    print("User profile created with total income = {}".format(totalIncome))
 
+if args['viewtotal']:
+    print("Total Income = {}".format(viewTotalIncome()))
 
 if args['viewexpense']:
     category = args['<viewCategory>']
@@ -50,7 +54,7 @@ if args['logpay']:
 if args['logexpense']:
     try:
         amount = float(args['<amount>'])
-        log(amount, args['<category>'], args['<message>'])
+        logExpense(amount, args['<category>'], args['<message>'])
     except:
         print('Error')
         print(usage)
