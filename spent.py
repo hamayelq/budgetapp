@@ -187,7 +187,6 @@ def viewTotalIncome():
     SELECT * FROM TotalIncome
     '''
     cursor.execute(SQL)
-    # results = cursor.fetchall()
     totalIncome = cursor.fetchone()[0]
 
     return totalIncome
